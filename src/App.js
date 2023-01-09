@@ -1,24 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
-
+import css from "./App.css";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Form from "./Form";
+import List from "./List";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 function App() {
+  const [value, setValue] = React.useState(0);
+  const [id, setId] = React.useState();
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <AppBar position="static">
+          <Tabs className={css.app} value={value} onChange={handleChange}>
+            <Tab label="List" component={Link} to="/" />
+            <Tab label="New" component={Link} to="/new" />
+          </Tabs>
+        </AppBar>
+        <Routes>
+          <Route path="/" element={<List setId={setId} />} />
+          <Route exact path="/new" element={<Form />} />
+          <Route path="/edit" element={<Form id={id} />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
