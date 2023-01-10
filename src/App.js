@@ -1,34 +1,64 @@
-import css from "./App.css";
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import React, { useState } from "react";
 import Form from "./Form";
 import List from "./List";
 import AppBar from "@material-ui/core/AppBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-function App() {
-  const [value, setValue] = React.useState(0);
-  const [id, setId] = React.useState();
+import Button from "@material-ui/core/Button";
+import { makeStyles } from "@material-ui/styles";
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+
+const useStyles = makeStyles({
+  app: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  btn: {
+    display: "inline-block",
+    width: "49%",
+    color: "#fff",
+    textAlign: "center",
+  },
+  appBar: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#3f51b5",
+  },
+});
+
+function App() {
+  const classes = useStyles();
+  const [page, setPage] = useState("list");
+  const [item, setItem] = useState();
+
+  const handleChange = (data) => {
+    setPage(data.page);
+    setItem(data.item);
   };
+
   return (
-    <Router>
+    <div>
+      <AppBar position="static" className={classes.appBar}>
+        <Button
+          className={classes.btn}
+          color={page === "list" ? "primary" : "secondary"}
+          onClick={() => setPage("list")}
+        >
+          List
+        </Button>
+        <Button
+          className={classes.btn}
+          color={page === "new" ? "primary" : "secondary"}
+          onClick={() => handleChange({page: "new", item: null}) }
+        >
+          New
+        </Button>
+      </AppBar>
       <div>
-        <AppBar position="static">
-          <Tabs className={css.app} value={value} onChange={handleChange}>
-            <Tab label="List" component={Link} to="/" />
-            <Tab label="New" component={Link} to="/new" />
-          </Tabs>
-        </AppBar>
-        <Routes>
-          <Route path="/" element={<List setId={setId} />} />
-          <Route exact path="/new" element={<Form />} />
-          <Route path="/edit" element={<Form id={id} />} />
-        </Routes>
+        {page === "list" && <List handleChange={handleChange} />}
+        {page === "new" && <Form setPage={setPage} item={item} />}
       </div>
-    </Router>
+    </div>
   );
 }
 

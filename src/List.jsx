@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import css from "./list.css";
+import sendRequest from "./util";
+// import { useToasts } from "react-toast-notifications";
 import {
   Table,
   TableBody,
@@ -8,12 +9,21 @@ import {
   TableCell,
   Button,
 } from "@material-ui/core/";
-import { useNavigate } from "react-router-dom";
-function List(setId) {
+//import ENV from "./config";
+
+const List = ({handleChange}) => {
+  const [reload, setReload] = useState(true);
   const [items, setItems] = useState([]);
-  const navigate = useNavigate();
+ // url = ENV.API.endpoint;
+
   useEffect(() => {
-    fetch("https://opjzr88ro7.execute-api.ca-central-1.amazonaws.com/dev")
+    fetch("https://opjzr88ro7.execute-api.ca-central-1.amazonaws.com/dev", {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
       .then((response) => response.json())
       .then((data) => {
         setItems(data.body);
@@ -22,15 +32,22 @@ function List(setId) {
       .catch((error) => {
         console.error(error);
       });
-  }, []);
+  }, [reload]);
 
-  const handleDelete = (id) => {
-    // TODO: Add code to handle delete button click
+
+  const handleDelete = (item) => {
+    sendRequest("DELETE", { id: item._id });
+    setReload(!reload);
+  };
+
+  const handleEdit = (item) => {
+    console.log("handleedit", item);
+    handleChange({page:"new", item});
   };
 
   return (
     <div>
-      <Table className={`${css.table}`}>
+      <Table>
         <TableHead>
           <TableRow>
             <TableCell>First Name</TableCell>
@@ -47,17 +64,15 @@ function List(setId) {
               <TableCell>{item.phoneNumber}</TableCell>
               <TableCell>
                 <Button
-                  onClick={() => {
-                    setId(item._id);
-
-                    // Somewhere in your code, e.g. inside a handler:
-                    navigate("/edit");
-                  }}
-                  className={`${css.btn}`}
+                  onClick={() => handleEdit(item)}
                 >
                   Edit
                 </Button>
-                <Button className={`${css.btn}`}>Delete</Button>
+                <Button
+                  onClick={() => handleDelete(item)}
+                >
+                  Delete
+                </Button>
               </TableCell>
             </TableRow>
           ))}
